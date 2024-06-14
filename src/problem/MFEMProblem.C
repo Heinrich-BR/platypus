@@ -18,12 +18,23 @@ MFEMProblem::validParams()
 
 MFEMProblem::MFEMProblem(const InputParameters & params)
   : ExternalProblem(params),
+    _device("cuda"),
     _input_mesh(_mesh.parameters().get<MeshFileName>("file")),
     _coefficients(),
     _outputs(),
     _exec_params()
-{
-  hephaestus::logger.set_level(spdlog::level::info);
+    {
+  hephaestus::logger.set_level(spdlog::level::info);  
+  _device.Print(std::cout);
+  std::cout << "Device is enabled = " << _device.IsEnabled() << std::endl;
+  std::cout << "Testing Device..." << std::endl;
+  long int N = 1<<28 ;
+  float *A_host = new float[N];
+  float *A_dev;
+  size_t bytes = sizeof(float)*N;
+  cudaMalloc( &A_dev, bytes );
+  cudaMemcpy( A_dev, A_host, bytes, cudaMemcpyHostToDevice);
+
 }
 
 MFEMProblem::~MFEMProblem() {}
